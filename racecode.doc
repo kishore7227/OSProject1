@@ -1,0 +1,60 @@
+#include<iostream>
+using namespace std;
+int available_resources=5;
+pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
+
+int decreasecount(int count){
+
+if(available_resources<count)
+{
+printf("\nStart of applications are denied since all the licenses are in use\n");
+return -1;
+}
+
+else {
+pthread_mutex_lock(&m);
+available_resources -= count;      /*Race Condition*/
+pthread_mutex_unlock(&m);
+return 0;
+}
+printf("\nAfter starting all the applications the remaining licenses are %d",available_resources);
+}
+
+int increasecount(int count) {
+pthread_mutex_lock(&m);
+available_resources += count;     /*Race Condition*/
+pthread_mutex_unlock(&m);
+printf("\nAfter terminating the applications the remaining licenses are %d",available_resources);
+return 0;
+}
+
+int main()
+{
+int count,s;
+while(s!=4)
+{
+printf("\nChoose any of the below options:\n1.Start an application\n2.Terminate the application\n3.Status of currently available licenses\n4.Exit\n");
+scanf("%d",&s);
+switch(s)
+{
+case 1:
+	printf("\nEnter no of applications you want to start ");
+	scanf("%d",&count);
+	decreasecount(count);
+	break;
+case 2:
+	printf("\nEnter no of applications you want to terminate ");
+	scanf("%d",&count);
+	increasecount(count);
+	break;
+case 3:
+	printf("\nThe no of available licenses are %d ",available_resources);
+	break;
+case 4:
+	break;
+default:
+	printf("\nPlease choose any one of the above options ");
+}
+}
+return 0;
+}
